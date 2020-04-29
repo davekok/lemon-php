@@ -2,6 +2,9 @@
 /* Driver template for the LEMON parser generator.
 ** The author disclaims copyright to this source code.
 */
+
+declare(strict_types=1);
+
 /* First off, code is included which follows the "include" declaration
 ** in the input file. */
 
@@ -19,26 +22,28 @@
 **      the information used by the action routines in the grammar.
 **      It is sometimes called the "minor" token.
 */
-class ParseStackEntry {
-  var /* int */ $stateno;       /* The state-number */
-  var /* int */ $major;         /* The major token value.  This is the code
-                     ** number for the token at this stack level */
-  var $minor; /* The user-supplied minor token value.  This
-                     ** is the value of the token  */
-};
+class ParseStackEntry
+{
+  public int $stateno;       /* The state-number */
+  public int $major;         /* The major token value.  This is the code
+                             ** number for the token at this stack level */
+  public $minor;             /* The user-supplied minor token value.  This
+                             ** is the value of the token  */
+}
 
 /* The state of the parser is completely contained in an instance of
 ** the following structure */
-class Parse {
-  var /* int */ $yyidx = -1;                    /* Index of top element in stack */
-  var /* int */ $yyerrcnt;                 /* Shifts left before out of the error */
+class Parse
+{
+  private int $yyidx = -1;         /* Index of top element in stack */
+  private int $yyerrcnt;           /* Shifts left before out of the error */
   // ParseARG_SDECL                /* A place to hold %extra_argument */
-  var /* yyStackEntry */ $yystack = array(
+  private /* yyStackEntry */ $yystack = [
   	/* of YYSTACKDEPTH elements */
-	);  /* The parser's stack */
+	];  /* The parser's stack */
 
-  var $yyTraceFILE = null;
-  var $yyTracePrompt = null;
+  private $yyTraceFILE = null;
+  private $yyTracePrompt = null;
 
 
 
@@ -90,9 +95,9 @@ class Parse {
 
   /* since we cant use expressions to initialize these as class
    * constants, we do so during parser init. */
-  var $YY_NO_ACTION;
-  var $YY_ACCEPT_ACTION;
-  var $YY_ERROR_ACTION;
+  private $YY_NO_ACTION;
+  private $YY_ACCEPT_ACTION;
+  private $YY_ERROR_ACTION;
 
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
@@ -153,9 +158,9 @@ class Parse {
 ** but it does not parse, the type of the token is changed to ID and
 ** the parse is retried before an error is thrown.
 */
-static $yyFallback = array(
+static $yyFallback = [
 %%
-);
+];
 
 /*
 ** Turn parser tracing on by giving a stream to which to write the trace
@@ -174,30 +179,34 @@ static $yyFallback = array(
 ** Outputs:
 ** None.
 */
-function trace(/* stream */ $TraceFILE, /* string */ $zTracePrompt){
+public function trace(/* stream */ $TraceFILE, string $zTracePrompt)
+{
   $this->yyTraceFILE = $TraceFILE;
   $this->yyTracePrompt = $zTracePrompt;
-  if( $this->yyTraceFILE===null ) $this->yyTracePrompt = null;
-  else if( $this->yyTracePrompt===null ) $this->yyTraceFILE = null;
+  if ($this->yyTraceFILE === null)
+    $this->yyTracePrompt = null;
+  else if ($this->yyTracePrompt === null)
+    $this->yyTraceFILE = null;
 }
 
 /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
-static $yyTokenName = array(
+static $yyTokenName = [
 %%
-);
+];
 
 /* For tracing reduce actions, the names of all rules are required.
 */
-static $yyRuleName = array(
+static $yyRuleName = [
 %%
-);
+];
 
 /*
 ** This function returns the symbolic name associated with a token
 ** value.
 */
-function getTokenName(/* int */ $tokenType){
+public function getTokenName(int $tokenType)
+{
   if (isset(self::$yyTokenName[$tokenType]))
     return self::$yyTokenName[$tokenType];
   return "Unknown";
@@ -208,8 +217,10 @@ function getTokenName(/* int */ $tokenType){
 ** "yymajor" is the symbol code, and "yypminor" is a pointer to
 ** the value.
 */
-private function yy_destructor($yymajor, $yypminor){
-  switch( $yymajor ){
+private function yy_destructor($yymajor, $yypminor)
+{
+  switch ($yymajor)
+  {
     /* Here is inserted the actions which take place when a
     ** terminal or non-terminal is destroyed.  This can happen
     ** when the symbol is popped from the stack during a
@@ -233,15 +244,18 @@ private function yy_destructor($yymajor, $yypminor){
 **
 ** Return the major token number for the symbol popped.
 */
-private function yy_pop_parser_stack() {
-  if ($this->yyidx < 0) return 0;
+private function yy_pop_parser_stack()
+{
+  if ($this->yyidx < 0)
+    return 0;
   $yytos = $this->yystack[$this->yyidx];
-  if( $this->yyTraceFILE ) {
+  if ($this->yyTraceFILE)
+  {
     fprintf($this->yyTraceFILE,"%sPopping %s\n",
       $this->yyTracePrompt,
       self::$yyTokenName[$yytos->major]);
   }
-  $this->yy_destructor( $yytos->major, $yytos->minor);
+  $this->yy_destructor($yytos->major, $yytos->minor);
   unset($this->yystack[$this->yyidx]);
   $this->yyidx--;
   return $yytos->major;
@@ -259,9 +273,9 @@ private function yy_pop_parser_stack() {
 **       from malloc.
 ** </ul>
 */
-function __destruct()
+public function __destruct()
 {
-  while($this->yyidx >= 0)
+  while ($this->yyidx >= 0)
     $this->yy_pop_parser_stack();
 }
 
@@ -275,7 +289,8 @@ function __destruct()
 */
 private function yy_find_shift_action(
   $iLookAhead     /* The look-ahead token */
-){
+)
+{
   $i = 0;
   $stateno = $this->yystack[$this->yyidx]->stateno;
 
@@ -327,7 +342,8 @@ private function yy_find_shift_action(
 private function yy_find_reduce_action(
   $stateno,              /* Current state number */
   $iLookAhead     /* The look-ahead token */
-){
+)
+{
   $i = 0;
 
   if( $stateno>self::YY_REDUCE_MAX ||
@@ -352,7 +368,8 @@ private function yy_shift(
   $yyNewState,               /* The new state to shift in */
   $yyMajor,                  /* The major token to shift in */
   $yypMinor         /* Pointer ot the minor token to shift in */
-){
+)
+{
   $this->yyidx++;
   if (isset($this->yystack[$this->yyidx])) {
     $yytos = $this->yystack[$this->yyidx];
@@ -374,7 +391,8 @@ private function yy_shift(
   }
 }
 
-private function __overflow_dead_code() {
+private function __overflow_dead_code()
+{
   /* if the stack can overflow (it can't in the PHP implementation)
    * Then the following code would be emitted */
 %%
@@ -390,9 +408,9 @@ static const struct {
   unsigned char nrhs;     // Number of right-hand side symbols in the rule
 } yyRuleInfo[] = {
 */
-static $yyRuleInfo = array(
+static $yyRuleInfo = [
 %%
-);
+];
 
 /*
 ** Perform a reduce action and the shift that must immediately
@@ -400,7 +418,8 @@ static $yyRuleInfo = array(
 */
 private function yy_reduce(
   $yyruleno                 /* Number of the rule by which to reduce */
-){
+)
+{
   $yygoto = 0;                     /* The next state */
   $yyact = 0;                      /* The next action */
   $yygotominor = null;        /* The LHS of the rule reduced */
@@ -442,7 +461,8 @@ private function yy_reduce(
 ** The following code executes when the parse fails
 */
 private function yy_parse_failed(
-){
+)
+{
   if( $this->yyTraceFILE ){
     fprintf($this->yyTraceFILE,"%sFail!\n",$this->yyTracePrompt);
   }
@@ -458,7 +478,8 @@ private function yy_parse_failed(
 private function yy_syntax_error(
   $yymajor,                   /* The major type of the error token */
   $yyminor            /* The minor type of the error token */
-){
+)
+{
 %%
 }
 
@@ -466,7 +487,8 @@ private function yy_syntax_error(
 ** The following is executed when the parser accepts
 */
 private function yy_accept(
-){
+)
+{
   if( $this->yyTraceFILE ){
     fprintf($this->yyTraceFILE,"%sAccept!\n",$this->yyTracePrompt);
   }
@@ -498,7 +520,8 @@ private function yy_accept(
 function parse(
   $yymajor,                 /* The major token code number */
   $yyminor = null           /* The value for the token */
-){
+)
+{
   $yyact = 0;            /* The parser action. */
   $yyendofinput = 0;     /* True if we are at the end of input */
   $yyerrorhit = 0;   /* True if yymajor has invoked an error */
