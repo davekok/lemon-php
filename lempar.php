@@ -38,7 +38,7 @@ class Parse
   private int $yyidx = -1;         /* Index of top element in stack */
   private int $yyerrcnt;           /* Shifts left before out of the error */
   // ParseARG_SDECL                /* A place to hold %extra_argument */
-  private /* yyStackEntry */ $yystack = [
+  private array $yystack = [
   	/* of YYSTACKDEPTH elements */
 	];  /* The parser's stack */
 
