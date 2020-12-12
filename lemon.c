@@ -2993,7 +2993,7 @@ int *lineno;
     iStart = 0;
     if( name ){
       for(i=0; line[i]; i++){
-        if( line[i]=='P' && strncmp(&line[i],"Parse",5)==0
+        if( line[i]=='P' && strncmp(&line[i],"Parse",5)==0 && line[i+5]!='r'
           && (i==0 || !isalpha(line[i-1]))
         ){
           if( i>iStart ) fprintf(out,"%.*s",i-iStart,&line[iStart]);
@@ -3019,9 +3019,9 @@ struct lemon *lemp;
   char *cp;
 
   if (target_lang == LANG_C) {
-    templatename = "/app/lempar.c";
+    templatename = "/app/src/lempar.c";
   } else {
-    templatename = "/app/lempar.php";
+    templatename = "/app/src/ParserTemplate.php";
   }
 
   cp = strrchr(lemp->filename,'.');
